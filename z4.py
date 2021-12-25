@@ -48,7 +48,7 @@ def find_all_solutions(constraints):
         model = solver.model()
         yield model
 
-        solver.add(z3.Not(z3.And([f() == model[f] for f in model])))
+        solver.add(z3.Not(z3.And([f() == model[f] for f in model if f.arity() == 0])))
 
 
 def easy_prove(claim):
