@@ -6,6 +6,9 @@ authors = ["Asger Hautop Drewsen <asgerdrewsen@gmail.com>"]
 license = "GPL-3.0-only"
 readme = "README.md"
 repository = "https://github.com/Tyilo/z4"
+packages = [
+	{ include = "z4.py" },
+]
 
 [tool.poetry.dependencies]
 python = "^3.7"
