@@ -65,6 +65,15 @@ z3.BitVecRef.__rshift__ = z3.LShR
 z3.BitVecRef.__rrshift__ = lambda a, b: z3.LShR(b, a)
 
 
+z3.BoolRef.__add__ = lambda self, other: Or(self, other)
+z3.BoolRef.__radd__ = lambda self, other: self + other
+
+z3.BoolRef.__mul__ = lambda self, other: And(self, other)
+z3.BoolRef.__rmul__ = lambda self, other: self * other
+
+z3.BoolRef.__invert__ = lambda self: Not(self)
+
+
 class ByteVec(z3.BitVecRef):
     def __init__(self, name, byte_count, ctx=None):
         self.byte_count = byte_count
