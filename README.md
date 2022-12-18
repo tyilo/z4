@@ -2,6 +2,12 @@
 
 [z3](https://github.com/Z3Prover/z3) with some improvements:
 * Change the right shift operation on `BitVec`'s to be logical instead of arithmetic
+* Extend the `*` operation on `BoolRef`'s to work between two `BoolRef`'s.
+* Add additional operations to `BoolRef`'s:
+  * `+`, returning an Int kind such that e.g `True+True+False==2`
+  * `&`, utilizing `And()`
+  * `|`, utilizing `Or()`
+  * `~`, utilizing `Not()`
 * Add the `ByteVec` class
 * Some helper methods for solving:
   * `easy_solve`

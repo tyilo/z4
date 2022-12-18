@@ -65,6 +65,26 @@ z3.BitVecRef.__rshift__ = z3.LShR
 z3.BitVecRef.__rrshift__ = lambda a, b: z3.LShR(b, a)
 
 
+z3.BoolRef.__and__ = z3.And
+z3.BoolRef.__rand__ = lambda a, b: a & b
+
+z3.BoolRef.__or__ = z3.Or
+z3.BoolRef.__ror__ = lambda a, b: a | b
+
+z3.BoolRef.__xor__ = z3.Xor
+z3.BoolRef.__rxor__ = lambda a, b: a ^ b
+
+z3.BoolRef.__invert__ = z3.Not
+
+z3.BoolRef.__add__ = lambda a, b: BoolToInt(a) + (BoolToInt(b) if isinstance(b, z3.BoolRef) else b)
+z3.BoolRef.__radd__ = lambda a, b: a + b
+
+_original_bool_ref_mul = z3.BoolRef.__mul__
+z3.BoolRef.__mul__ = lambda a, b: BoolToInt(a) * BoolToInt(b) if isinstance(b, z3.BoolRef) else _original_bool_ref_mul(a, b)
+z3.BoolRef.__rmul__ = lambda a, b: a * b
+
+
+
 class ByteVec(z3.BitVecRef):
     def __init__(self, name, byte_count, ctx=None):
         self.byte_count = byte_count
@@ -141,6 +161,15 @@ def _test():
     s2.add(text[2] == ord("O"))
     assert s2.check() == z3.sat
     assert text.value(s2.model()) == b"FOO"
+
+    x,y = z3.Ints('x y')
+    s3 = z3.Solver()
+    s3.add( ((x==4)|(x<0)) + (~(x==y)&(y==4))*(x**2==y)*1 + (x==1337)*0 == 2 )
+    assert s3.check() == z3.sat
+    m3 = s3.model()
+
+    assert m3[x] == -2
+    assert m3[y] == 4
 
 
 if __name__ == "__main__":
