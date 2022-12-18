@@ -162,6 +162,15 @@ def _test():
     assert s2.check() == z3.sat
     assert text.value(s2.model()) == b"FOO"
 
+    x,y = z3.Ints('x y')
+    s3 = z3.Solver()
+    s3.add( ((x==4)|(x<0)) + (~(x==y)&(y==4))*(x**2==y)*1 + (x==1337)*0 == 2 )
+    assert s3.check() == z3.sat
+    m3 = s3.model()
+
+    assert m3[x] == -2
+    assert m3[y] == 4
+
 
 if __name__ == "__main__":
     _test()
