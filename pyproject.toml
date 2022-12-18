@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "z4-solver"
-version = "2022.12.18.0"
+version = "2022.12.18.1"
 description = "z3++"
 authors = ["Asger Hautop Drewsen <asgerdrewsen@gmail.com>"]
 license = "GPL-3.0-only"
