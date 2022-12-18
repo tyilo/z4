@@ -11,7 +11,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.10"
 z3-solver = "^4.8"
 
 [tool.poetry.dev-dependencies]
@@ -19,3 +19,30 @@ z3-solver = "^4.8"
 [build-system]
 requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
+
+[tool.black]
+target-version = ['py310']
+exclude = '''
+
+(
+  /(
+      \.eggs         # exclude a few common directories in the
+    | \.git          # root of the project
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+    | db_data
+  )/
+)
+'''
+
+[tool.pycln]
+all = true
+
+[tool.isort]
+profile = 'black'

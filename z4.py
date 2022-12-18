@@ -1,5 +1,4 @@
-import z3
-from z3 import *
+from z3 import *  # noqa
 
 
 class Z3SolveException(Exception):
@@ -15,12 +14,12 @@ class Z3Unknown(Z3SolveException):
 
 
 def easy_solve(constraints):
-    solver = z3.Solver()
+    solver = Solver()
     solver.add(*constraints)
     res = solver.check()
-    if res == z3.unsat:
+    if res == unsat:
         raise Z3Unsat
-    elif res == z3.unknown:
+    elif res == unknown:
         raise Z3Unknown
 
     return solver.model()
@@ -30,65 +29,70 @@ def find_all_solutions(constraints):
     """
     >>> def normalize_result(r):
     ...     return sorted(sorted((f.name(), m[f].as_long()) for f in m) for m in r)
-    >>> a, b, c = z3.Ints("a b c")
+    >>> a, b, c = Ints("a b c")
     >>> normalize_result(find_all_solutions([0 <= a, a < 3]))
     [[('a', 0)], [('a', 1)], [('a', 2)]]
     >>> normalize_result(find_all_solutions([0 <= a, a < 2, b == 2 * a]))
     [[('a', 0), ('b', 0)], [('a', 1), ('b', 2)]]
     """
-    solver = z3.Solver()
+    solver = Solver()
     solver.add(*constraints)
     while True:
         res = solver.check()
-        if res == z3.unknown:
+        if res == unknown:
             raise Z3Unknown
-        elif res == z3.unsat:
+        elif res == unsat:
             return
 
         model = solver.model()
         yield model
 
-        solver.add(z3.Not(z3.And([f() == model[f] for f in model if f.arity() == 0])))
+        solver.add(Not(And([f() == model[f] for f in model if f.arity() == 0])))
 
 
 def easy_prove(claim):
-    solver = z3.Solver()
-    solver.add(z3.Not(claim))
+    solver = Solver()
+    solver.add(Not(claim))
     res = solver.check()
-    if res == z3.unknown:
+    if res == unknown:
         raise Z3Unknown
 
-    return res == z3.unsat
+    return res == unsat
 
 
-z3.BitVecRef.__rshift__ = z3.LShR
-z3.BitVecRef.__rrshift__ = lambda a, b: z3.LShR(b, a)
+BitVecRef.__rshift__ = LShR
+BitVecRef.__rrshift__ = lambda a, b: LShR(b, a)
 
 
-z3.BoolRef.__and__ = z3.And
-z3.BoolRef.__rand__ = lambda a, b: a & b
+BoolRef.__and__ = And
+BoolRef.__rand__ = lambda a, b: a & b
 
-z3.BoolRef.__or__ = z3.Or
-z3.BoolRef.__ror__ = lambda a, b: a | b
+BoolRef.__or__ = Or
+BoolRef.__ror__ = lambda a, b: a | b
 
-z3.BoolRef.__xor__ = z3.Xor
-z3.BoolRef.__rxor__ = lambda a, b: a ^ b
+BoolRef.__xor__ = Xor
+BoolRef.__rxor__ = lambda a, b: a ^ b
 
-z3.BoolRef.__invert__ = z3.Not
+BoolRef.__invert__ = Not
 
-z3.BoolRef.__add__ = lambda a, b: BoolToInt(a) + (BoolToInt(b) if isinstance(b, z3.BoolRef) else b)
-z3.BoolRef.__radd__ = lambda a, b: a + b
+BoolRef.__add__ = lambda a, b: BoolToInt(a) + (
+    BoolToInt(b) if isinstance(b, BoolRef) else b
+)
+BoolRef.__radd__ = lambda a, b: a + b
 
-_original_bool_ref_mul = z3.BoolRef.__mul__
-z3.BoolRef.__mul__ = lambda a, b: BoolToInt(a) * BoolToInt(b) if isinstance(b, z3.BoolRef) else _original_bool_ref_mul(a, b)
-z3.BoolRef.__rmul__ = lambda a, b: a * b
+_original_bool_ref_mul = BoolRef.__mul__
+BoolRef.__mul__ = (
+    lambda a, b: BoolToInt(a) * BoolToInt(b)
+    if isinstance(b, BoolRef)
+    else _original_bool_ref_mul(a, b)
+)
+BoolRef.__rmul__ = lambda a, b: a * b
 
 
-
-class ByteVec(z3.BitVecRef):
+class ByteVec(BitVecRef):
     def __init__(self, name, byte_count, ctx=None):
         self.byte_count = byte_count
-        self.bv = z3.BitVec(name, byte_count * 8, ctx)
+        self.bv = BitVec(name, byte_count * 8, ctx)
 
     def __getattr__(self, attr):
         return getattr(self.bv, attr)
@@ -106,7 +110,7 @@ class ByteVec(z3.BitVecRef):
         if not (0 <= i < len(self)):
             raise IndexError
 
-        return z3.Extract(8 * i + 7, 8 * i, self.bv)
+        return Extract(8 * i + 7, 8 * i, self.bv)
 
     def value(self, model):
         v = model[self.bv].as_long()
@@ -114,63 +118,24 @@ class ByteVec(z3.BitVecRef):
 
 
 def BoolToInt(x):
-    return z3.If(x, 1, 0)
+    return If(x, 1, 0)
 
 
 def Sgn(x):
-    return z3.If(x == 0, 0, z3.If(x > 0, 1, -1))
+    return If(x == 0, 0, If(x > 0, 1, -1))
 
 
 def Abs(x):
-    return z3.If(x >= 0, x, -x)
+    return If(x >= 0, x, -x)
 
 
 def TruncDiv(a, b):
     """
     Truncated division, a / b rounded towards zero.
 
-    >>> a, b, c = z3.Ints("a b c")
-    >>> easy_prove(z3.Implies(TruncDiv(a, b) == c, Abs(b) * Abs(c) <= Abs(a)))
+    >>> a, b, c = Ints("a b c")
+    >>> easy_prove(Implies(TruncDiv(a, b) == c, Abs(b) * Abs(c) <= Abs(a)))
     True
     """
     v = Abs(a) / Abs(b)
     return Sgn(a) * Sgn(b) * v
-
-
-def _test():
-    a = ByteVec("a", 1)
-    b = ByteVec("b", 1)
-    c = ByteVec("c", 1)
-    d = ByteVec("d", 1)
-
-    s = z3.Solver()
-    s.add(a == 0xFE)
-    s.add(b == (a >> 1))
-    s.add(c == 0x2)
-    s.add(d == (0xFE >> c))
-    assert s.check() == z3.sat
-    m = s.model()
-
-    assert m[b].as_long() == 0x7F
-    assert m[d].as_long() == 0x3F
-
-    text = ByteVec("text", 3)
-    s2 = z3.Solver()
-    s2.add(text[0] == ord("F"))
-    s2.add(text[1] == ord("O"))
-    s2.add(text[2] == ord("O"))
-    assert s2.check() == z3.sat
-    assert text.value(s2.model()) == b"FOO"
-
-    x,y = z3.Ints('x y')
-    s3 = z3.Solver()
-    s3.add( ((x==4)|(x<0)) + (~(x==y)&(y==4))*(x**2==y)*1 + (x==1337)*0 == 2 )
-    assert s3.check() == z3.sat
-    m3 = s3.model()
-
-    assert m3[x] == -2
-    assert m3[y] == 4
-
-
-if __name__ == "__main__":
-    _test()
