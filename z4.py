@@ -13,6 +13,14 @@ class Z3Unknown(Z3SolveException):
     pass
 
 
+class Z3CounterExample(Z3SolveException):
+    model: ModelRef
+
+    def __init__(self, model: ModelRef):
+        super().__init__(model)
+        self.model = model
+
+
 def easy_solve(constraints):
     solver = Solver()
     solver.add(*constraints)
@@ -56,8 +64,10 @@ def easy_prove(claim):
     res = solver.check()
     if res == unknown:
         raise Z3Unknown
-
-    return res == unsat
+    elif res == sat:
+        raise Z3CounterExample(solver.model())
+    else:
+        return True
 
 
 BitVecRef.__rshift__ = LShR
