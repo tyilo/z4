@@ -79,7 +79,8 @@ z3.BoolRef.__invert__ = Not
 z3.BoolRef.__add__ = lambda a, b: BoolToInt(a) + (BoolToInt(b) if isinstance(b, BoolRef) else b)
 z3.BoolRef.__radd__ = lambda a, b: a + b
 
-z3.BoolRef.__mul__ = lambda a, b: BoolToInt(a) * (BoolToInt(b) if isinstance(b, BoolRef) else b)
+_original_bool_ref_mul = z3.BoolRef.__mul__
+z3.BoolRef.__mul__ = lambda a, b: BoolToInt(a) * BoolToInt(b) if isinstance(b, BoolRef) else _original_bool_ref_mul(a, b)
 z3.BoolRef.__rmul__ = lambda a, b: a * b
 
 
