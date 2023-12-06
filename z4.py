@@ -1,4 +1,19 @@
 from z3 import *  # noqa
+from z3 import (
+    Abs,
+    And,
+    BitVec,
+    BitVecRef,
+    Extract,
+    If,
+    LShR,
+    ModelRef,
+    Not,
+    sat,
+    Solver,
+    unknown,
+    unsat,
+)
 
 
 class Z3SolveException(Exception):
@@ -74,31 +89,6 @@ BitVecRef.__rshift__ = LShR
 BitVecRef.__rrshift__ = lambda a, b: LShR(b, a)
 
 
-BoolRef.__and__ = And
-BoolRef.__rand__ = lambda a, b: a & b
-
-BoolRef.__or__ = Or
-BoolRef.__ror__ = lambda a, b: a | b
-
-BoolRef.__xor__ = Xor
-BoolRef.__rxor__ = lambda a, b: a ^ b
-
-BoolRef.__invert__ = Not
-
-BoolRef.__add__ = lambda a, b: BoolToInt(a) + (
-    BoolToInt(b) if isinstance(b, BoolRef) else b
-)
-BoolRef.__radd__ = lambda a, b: a + b
-
-_original_bool_ref_mul = BoolRef.__mul__
-BoolRef.__mul__ = (
-    lambda a, b: BoolToInt(a) * BoolToInt(b)
-    if isinstance(b, BoolRef)
-    else _original_bool_ref_mul(a, b)
-)
-BoolRef.__rmul__ = lambda a, b: a * b
-
-
 class ByteVec(BitVecRef):
     def __init__(self, name, byte_count, ctx=None):
         self.byte_count = byte_count
@@ -133,10 +123,6 @@ def BoolToInt(x):
 
 def Sgn(x):
     return If(x == 0, 0, If(x > 0, 1, -1))
-
-
-def Abs(x):
-    return If(x >= 0, x, -x)
 
 
 def TruncDiv(a, b):

@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "z4-solver"
-version = "2022.12.18.1"
+version = "2023.12.06"
 description = "z3++"
-authors = ["Asger Hautop Drewsen <asgerdrewsen@gmail.com>"]
+authors = ["Asger Hautop Drewsen <asger@tyilo.com>"]
 license = "GPL-3.0-only"
 readme = "README.md"
 repository = "https://github.com/Tyilo/z4"
@@ -12,37 +12,16 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.10"
-z3-solver = "^4.8"
+z3-solver = "^4.12.4"
 
 [tool.poetry.dev-dependencies]
 
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.3"
+
 [build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
+requires = ["poetry>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
 
-[tool.black]
-target-version = ['py310']
-exclude = '''
-
-(
-  /(
-      \.eggs         # exclude a few common directories in the
-    | \.git          # root of the project
-    | \.hg
-    | \.mypy_cache
-    | \.tox
-    | \.venv
-    | _build
-    | buck-out
-    | build
-    | dist
-    | db_data
-  )/
-)
-'''
-
-[tool.pycln]
-all = true
-
-[tool.isort]
-profile = 'black'
+[tool.ruff]
+target-version = "py310"

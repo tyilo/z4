@@ -3,23 +3,34 @@
 [![PyPI](https://img.shields.io/pypi/v/z4-solver)](https://pypi.org/project/z4-solver/)
 
 [z3](https://github.com/Z3Prover/z3) with some improvements:
-* Change the right shift operation on `BitVec`'s to be logical instead of arithmetic
-* Extend the `*` operation on `BoolRef`'s to work between two `BoolRef`'s.
-* Add additional operations to `BoolRef`'s:
-  * `+`, returning an Int kind such that e.g `True + True + False == 2`
-  * `&`, utilizing `And()`
-  * `|`, utilizing `Or()`
-  * `~`, utilizing `Not()`
+
+* `BitVec`:
+  * Change the right shift operation to be logical instead of arithmetic
+
 * Add the `ByteVec` class
-* Some helper methods for solving:
+* Add some helper methods for solving:
   * `easy_solve`
   * `find_all_solutions`
   * `easy_prove`
+
 * Add some helper functions for z3 variables/constants:
   * `BoolToInt`
   * `Sgn`
-  * `Abs`
   * `TruncDiv`
+
+# Features implemented upstream
+
+These features were first provided by z4, before z3 included these features.
+They have now been removed from z4.
+
+* `BoolRef`:
+  * Support `*` for two `BoolRef`'s [`8efaaaf`](https://github.com/Z3Prover/z3/commit/8efaaaf24982ce810b8ea85fdf74eedc3dea29ad), [`ec74a87`](https://github.com/Z3Prover/z3/commit/ec74a874232b6b23b17c741a91fff75f8d2fa6c7)
+  * Support `+` [`f90b10a`](https://github.com/Z3Prover/z3/commit/f90b10a0c8e7f292bbe6288452f6176d1d73e608), [`a9513c1`](https://github.com/Z3Prover/z3/commit/a9513c19989454ac4aeaa83bdb6310cf6386835d)
+  * Support `&`, `|` and `~` [`f90b10a`](https://github.com/Z3Prover/z3/commit/f90b10a0c8e7f292bbe6288452f6176d1d73e608)
+  * Support `^` [`764f0d5`](https://github.com/Z3Prover/z3/commit/764f0d54a436bd93069778a385517e74aea47150)
+
+* Helper functions:
+  * `Abs` [`cf08cdf`](https://github.com/Z3Prover/z3/commit/cf08cdff9c62b8db2805dbd9c4935ccb9569f08d)
 
 ## Usage
 Install with `pip install z4-solver`.
