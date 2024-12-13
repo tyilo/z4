@@ -2,13 +2,17 @@ from z3 import *  # noqa
 from z3 import (
     Abs,
     And,
+    ArithRef,
     BitVec,
     BitVecRef,
     Extract,
     If,
+    IntNumRef,
     LShR,
     ModelRef,
     Not,
+    Optimize,
+    RatNumRef,
     sat,
     Solver,
     unknown,
@@ -35,6 +39,29 @@ class Z3CounterExample(Z3SolveException):
         super().__init__(model)
         self.model = model
 
+class Z3Unbounded(Z3SolveException):
+    model: ModelRef
+
+    def __init__(self, model: ModelRef):
+        super().__init__(model)
+        self.model = model
+
+
+def to_dict(model: ModelRef):
+    def to_python(v):
+        if isinstance(v, IntNumRef):
+            return v.as_long()
+
+        if isinstance(v, RatNumRef):
+            if v.is_int_value():
+                return v.as_long()
+            else:
+                return v.as_fraction()
+
+        return v
+
+    return {str(var): to_python(model[var]) for var in model}
+
 
 def easy_solve(constraints):
     solver = Solver()
@@ -47,6 +74,22 @@ def easy_solve(constraints):
 
     return solver.model()
 
+
+a = z3.Int("a")
+m = easy_solve([a == 1])
+one_int = m[a]
+
+a = z3.Real("a")
+m = easy_solve([a == 1])
+one_real = m[a]
+
+a = z3.Real("a")
+m = easy_solve([a * 2 == 1])
+half_real = m[a]
+
+a = z3.Real("a")
+m = easy_solve([a ** 2 == 2, a > 0])
+sqrt2_real = m[a]
 
 def find_all_solutions(constraints):
     """
@@ -83,6 +126,43 @@ def easy_prove(claim):
         raise Z3CounterExample(solver.model())
     else:
         return True
+
+
+def _optimize(cost, constraints, dir_f, obj_f):
+    opt = Optimize()
+    opt.add(*constraints)
+    objective = dir_f(opt, cost)
+    res = opt.check()
+    if res == unsat:
+        raise Z3Unsat
+    elif res == unknown:
+        raise Z3Unknown
+
+    model = opt.model()
+    value = obj_f(opt, objective)
+    if type(value) is ArithRef and str(value) == "oo":
+        raise Z3Unbounded(model)
+
+    return value, model
+
+
+def maximize(cost, constraints):
+    """
+    >>> a, b = Ints("a b")
+    >>> maximize(3 * a + b, [])
+    Traceback (most recent call last):
+      ...
+    z4.Z3Unbounded: ...
+    >>> maximize(3 * a + b, [0 <= a, 0 <= b, a + b == 10])
+    (30, [b = 0, a = 10])
+    """
+    return _optimize(cost, constraints, Optimize.maximize, Optimize.upper)
+
+
+def minimize(cost, constraints):
+    opt = Optimize()
+    opt.add(*constraints)
+    opt.minimize(cost)
 
 
 BitVecRef.__rshift__ = LShR
