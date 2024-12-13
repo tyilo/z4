@@ -1,27 +1,23 @@
-[tool.poetry]
+[project]
 name = "z4-solver"
 version = "2023.12.06"
 description = "z3++"
-authors = ["Asger Hautop Drewsen <asger@tyilo.com>"]
-license = "GPL-3.0-only"
 readme = "README.md"
-repository = "https://github.com/Tyilo/z4"
-packages = [
-	{ include = "z4.py" },
+authors = [
+	{ name = "Asger Hautop Drewsen", email = "asger@tyilo.com" }
+]
+license.text = "GPL-3.0-only"
+requires-python = ">=3.12"
+dependencies = [
+    "z3-solver>=4.13.3.0",
 ]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-z3-solver = "^4.12.4"
-
-[tool.poetry.dev-dependencies]
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^7.4.3"
+[project.urls]
+Repository = "https://github.com/Tyilo/z4"
 
 [build-system]
-requires = ["poetry>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.ruff]
-target-version = "py310"
+[tool.hatch.build.targets.wheel]
+packages = ["src/z4"]
