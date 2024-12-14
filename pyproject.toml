@@ -12,6 +12,11 @@ dependencies = [
     "z3-solver>=4.13.3.0",
 ]
 
+[dependency-groups]
+dev = [
+    "pytest>=8.3.4",
+]
+
 [project.urls]
 Repository = "https://github.com/Tyilo/z4"
 
