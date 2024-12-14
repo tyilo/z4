@@ -1,5 +1,5 @@
 version = 1
-requires-python = ">=3.12"
+requires-python = ">=3.10"
 
 [[package]]
 name = "z3-solver"
@@ -17,7 +17,7 @@ wheels = [
 
 [[package]]
 name = "z4-solver"
-version = "2023.12.6"
+version = "2024.12.14"
 source = { editable = "." }
 dependencies = [
     { name = "z3-solver" },
