@@ -86,8 +86,8 @@ class Tests(unittest.TestCase):
         d = ByteVec("d", 1)
 
         m = easy_solve([a == 0xFE, b == (a >> 1), c == 0x2, d == (0xFE >> c)])
-        self.assertEqual(b.value(m), b"\x7F")
-        self.assertEqual(d.value(m), b"\x3F")
+        self.assertEqual(b.value(m), b"\x7f")
+        self.assertEqual(d.value(m), b"\x3f")
 
     def test_byte_vec(self):
         text = ByteVec("text", 3)
