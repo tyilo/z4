@@ -118,7 +118,7 @@ wheels = [
 
 [[package]]
 name = "z4-solver"
-version = "2024.12.14"
+version = "2024.12.14.1"
 source = { editable = "." }
 dependencies = [
     { name = "z3-solver" },

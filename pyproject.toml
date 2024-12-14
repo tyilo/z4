@@ -1,6 +1,6 @@
 [project]
 name = "z4-solver"
-version = "2024.12.14"
+version = "2024.12.14.1"
 description = "z3++"
 readme = "README.md"
 authors = [
