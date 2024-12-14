@@ -2,6 +2,7 @@ from z3 import *  # noqa
 from z3 import (
     Abs,
     And,
+    ArithRef,
     BitVec,
     BitVecRef,
     Extract,
@@ -9,6 +10,7 @@ from z3 import (
     LShR,
     ModelRef,
     Not,
+    Optimize,
     sat,
     Solver,
     unknown,
@@ -29,6 +31,14 @@ class Z3Unknown(Z3SolveException):
 
 
 class Z3CounterExample(Z3SolveException):
+    model: ModelRef
+
+    def __init__(self, model: ModelRef):
+        super().__init__(model)
+        self.model = model
+
+
+class Z3Unbounded(Z3SolveException):
     model: ModelRef
 
     def __init__(self, model: ModelRef):
@@ -83,6 +93,32 @@ def easy_prove(claim):
         raise Z3CounterExample(solver.model())
     else:
         return True
+
+
+def _optimize(cost, constraints, dir_f, obj_f):
+    opt = Optimize()
+    opt.add(*constraints)
+    objective = dir_f(opt, cost)
+    res = opt.check()
+    if res == unsat:
+        raise Z3Unsat
+    elif res == unknown:
+        raise Z3Unknown
+
+    model = opt.model()
+    value = obj_f(opt, objective)
+    if type(value) is ArithRef and str(value) in {"oo", "-1*oo"}:
+        raise Z3Unbounded(model)
+
+    return value, model
+
+
+def maximize(cost, constraints):
+    return _optimize(cost, constraints, Optimize.maximize, Optimize.upper)
+
+
+def minimize(cost, constraints):
+    return _optimize(cost, constraints, Optimize.minimize, Optimize.lower)
 
 
 BitVecRef.__rshift__ = LShR

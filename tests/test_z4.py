@@ -1,9 +1,84 @@
 import unittest
+from fractions import Fraction
 
-from z4 import ByteVec, Int, easy_solve
+from z4 import (
+    ByteVec,
+    Int,
+    Real,
+    Z3Unknown,
+    Z3Unsat,
+    Z3Unbounded,
+    easy_solve,
+    maximize,
+    minimize,
+)
 
 
 class Tests(unittest.TestCase):
+    def test_maximize_int(self):
+        a = Int("a")
+        v, m = maximize(3 * a, [a * 2 <= 5])
+        self.assertEqual(v, 6)
+        self.assertEqual(m[a].as_long(), 2)
+
+    def test_maximize_real(self):
+        a = Real("a")
+        v, m = maximize(3 * a, [a * 2 <= 5])
+        self.assertEqual(v, Fraction(15, 2))
+        self.assertEqual(m[a].as_fraction(), Fraction(5, 2))
+
+    def test_maximize_unbounded_int(self):
+        a = Int("a")
+        with self.assertRaises(Z3Unbounded):
+            maximize(a, [])
+
+    def test_maximize_unbounded_real(self):
+        a = Real("a")
+        with self.assertRaises(Z3Unbounded):
+            maximize(a, [])
+
+    def test_maximize_no_solution(self):
+        a = Int("a")
+        with self.assertRaises(Z3Unsat):
+            maximize(a, [4 < 2 * a, 2 * a < 6])
+
+    def test_maximize_unknown(self):
+        a = Real("a")
+        with self.assertRaises(Z3Unknown):
+            maximize(a, [2**a == 3])
+
+    def test_minimize_int(self):
+        a = Int("a")
+        v, m = minimize(3 * a, [a * 2 >= 3])
+        self.assertEqual(v, 6)
+        self.assertEqual(m[a].as_long(), 2)
+
+    def test_minimize_real(self):
+        a = Real("a")
+        v, m = minimize(3 * a, [a * 2 >= 3])
+        self.assertEqual(v, Fraction(9, 2))
+        self.assertEqual(m[a].as_fraction(), Fraction(3, 2))
+
+    def test_minimize_unbounded_int(self):
+        a = Int("a")
+        with self.assertRaises(Z3Unbounded):
+            minimize(a, [])
+
+    def test_minimize_unbounded_real(self):
+        a = Real("a")
+        with self.assertRaises(Z3Unbounded):
+            minimize(a, [])
+
+    def test_minimize_no_solution(self):
+        a = Int("a")
+        with self.assertRaises(Z3Unsat):
+            minimize(a, [4 < 2 * a, 2 * a < 6])
+
+    def test_minimize_unknown(self):
+        a = Real("a")
+        with self.assertRaises(Z3Unknown):
+            minimize(a, [2**a == 3])
+
     def test_rshift(self):
         a = ByteVec("a", 1)
         b = ByteVec("b", 1)

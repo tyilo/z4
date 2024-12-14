@@ -13,6 +13,10 @@
   * `find_all_solutions`
   * `easy_prove`
 
+* Add some helper methods for optimizing:
+  * `maximize`
+  * `minimize`
+
 * Add some helper functions for z3 variables/constants:
   * `BoolToInt`
   * `Sgn`
