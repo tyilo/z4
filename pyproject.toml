@@ -21,3 +21,17 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/z4"]
+
+[tool.ruff]
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "D203", # Clashes with D211
+    "D212", # Clashes with D213
+
+    # Incompatible with formatter:
+    "COM812",
+    "ISC001",
+]
